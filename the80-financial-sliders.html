@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 80 Financial Sliders</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f7f8; --border:#e3e3e6;
+    --text:#1a1a1c; --text-2:#56565c; --text-3:#8a8a91;
+    --accent:#1a5cff; --accent-soft:#eef3ff;
+    --green:#0e7a3d; --green-soft:#ecf7f0;
+    --amber:#8a5a00; --amber-soft:#fdf4e3;
+    --seg1:#1a5cff; --seg2:#0e7a3d; --seg3:#a84b2f; --seg4:#6b4fbb;
+    --radius:10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#141416; --surface:#1d1d20; --border:#33333a;
+      --text:#f2f2f4; --text-2:#b4b4bb; --text-3:#85858d;
+      --accent:#6b93ff; --accent-soft:#1c2540;
+      --green:#4cc384; --green-soft:#16281f;
+      --amber:#e0b050; --amber-soft:#2b2312;
+      --seg1:#6b93ff; --seg2:#4cc384; --seg3:#e08a6c; --seg4:#a48cf0;
+    }
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+         background:var(--bg); color:var(--text); line-height:1.55; font-size:15px; }
+  main { max-width:900px; margin:0 auto; padding:36px 16px 80px; }
+  .kicker { font-size:12px; font-weight:650; letter-spacing:.06em; text-transform:uppercase; color:var(--text-3); }
+  h1 { font-size:28px; line-height:1.2; margin:6px 0 10px; }
+  .intro { color:var(--text-2); max-width:62ch; margin-bottom:28px; }
+
+  .panel { border:1px solid var(--border); border-radius:14px; padding:24px 22px; margin-bottom:28px; background:var(--bg); }
+  .tag { display:inline-block; font-size:11px; font-weight:650; padding:2px 10px; border-radius:999px;
+         background:var(--accent-soft); color:var(--accent); }
+  h2 { font-size:21px; line-height:1.25; margin:10px 0 8px; }
+  .shows { color:var(--text-2); max-width:64ch; margin-bottom:18px; }
+  .shows b { color:var(--text); }
+
+  .ctrl { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; }
+  .row + .row { margin-top:18px; padding-top:18px; border-top:1px solid var(--border); }
+  .lab { display:flex; justify-content:space-between; align-items:baseline; gap:12px; font-weight:600; }
+  .val { color:var(--accent); font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; }
+  input[type=range] { width:100%; margin:10px 0 4px; height:6px; border-radius:99px; appearance:none; -webkit-appearance:none;
+                      background:var(--border); outline:none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+                      background:var(--accent); border:3px solid var(--bg); box-shadow:0 0 0 1px var(--accent); cursor:pointer; }
+  input[type=range]::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--accent);
+                      border:3px solid var(--bg); cursor:pointer; }
+  .marks { display:flex; justify-content:space-between; font-size:11px; color:var(--text-3); }
+  .hint { font-size:12.5px; color:var(--text-3); margin-top:8px; }
+
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+  .presets button, .snap button { font:inherit; font-size:13px; border:1px solid var(--border); background:var(--surface);
+        color:var(--text-2); border-radius:999px; padding:5px 14px; cursor:pointer; }
+  .presets button:hover, .snap button:hover { border-color:var(--accent); color:var(--accent); }
+  .presets button.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .snap { display:flex; gap:8px; margin-top:12px; }
+
+  .total { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:16px 0 10px;
+           background:var(--green-soft); border:1px solid var(--border); border-radius:var(--radius); padding:14px 18px; }
+  .total .tl { font-size:12px; font-weight:650; text-transform:uppercase; letter-spacing:.05em; color:var(--green); }
+  .total .tv { font-size:34px; font-weight:750; color:var(--green); font-variant-numeric:tabular-nums; }
+
+  .bar { display:flex; height:16px; border-radius:99px; overflow:hidden; background:var(--border); }
+  .bar span { display:block; transition:width .25s; }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 18px; margin:10px 0 0; font-size:13px; color:var(--text-2); }
+  .legend i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; }
+  .legend b { color:var(--text); font-variant-numeric:tabular-nums; }
+  .legend .off { opacity:.4; }
+
+  .note { margin-top:14px; font-size:13px; color:var(--text-2); background:var(--amber-soft);
+          border-radius:var(--radius); padding:10px 14px; }
+  .note b { color:var(--amber); }
+  .mixbar { display:flex; height:26px; border-radius:8px; overflow:hidden; margin-top:4px; }
+  .mixbar div { color:#fff; font-size:12px; font-weight:650; display:flex; align-items:center; justify-content:center; transition:width .25s; }
+  .lab small { font-weight:400; color:var(--text-2); }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:14px; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:12px 14px; }
+  .stat .v { font-size:22px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .stat .l { font-size:12px; color:var(--text-3); }
+  .read { margin-top:12px; font-size:13.5px; color:var(--text-2); background:var(--accent-soft); border-radius:var(--radius); padding:10px 14px; }
+  footer { font-size:12px; color:var(--text-3); }
+</style>
+</head>
+<body>
+<main>
+  <div class="kicker">The 80 · Donor Book</div>
+  <h1>The financial sliders</h1>
+  <p class="intro">Every financial slider from the Executive Summary, the Investment page, the Influencer Network and the Narrative & Influence pitch, pulled onto one page. Move a slider and the numbers and bar update live.</p>
+
+  <!-- ============ SLIDERS 1 & 2 : EXECUTIVE SUMMARY ============ -->
+  <section class="panel" id="s1">
+    <span class="tag">Executive Summary · 02 Model State</span>
+    <h2>What the national team costs, and what one state costs on top of it</h2>
+    <p class="shows"><b>What it shows:</b> The full annual cost of the organization, staff and platform. The national team is hired first and is a fixed cost. Each state is then the same template, repeated. Move both sliders to build the organization.</p>
+
+    <div class="ctrl">
+      <div class="row">
+        <div class="lab"><span>National team</span><span class="val" id="m-nat-v">Hired</span></div>
+        <input type="range" id="m-nat" min="0" max="1" step="1" value="1" aria-label="National team">
+        <div class="marks"><span>Not yet</span><span>Hired</span></div>
+        <p class="hint">Hired before state deployment. Senior leadership, civic and political staff, engine staff, plus operating costs — $6.235M a year, whether one state is running or six.</p>
+      </div>
+      <div class="row">
+        <div class="lab"><span>States deployed</span><span class="val" id="m-st-v">6</span></div>
+        <input type="range" id="m-st" min="1" max="6" step="1" value="6" aria-label="States deployed">
+        <div class="marks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+        <p class="hint">Arizona, Georgia, Iowa, Michigan, North Carolina and Texas — the six priority states. Each carries the same three functions at $3.94M a year.</p>
+      </div>
+    </div>
+
+    <div class="total"><span class="tl">Annual, staff &amp; platform</span><span class="tv" id="m-total">$29.88M</span></div>
+    <div class="bar" aria-hidden="true"><span id="m-b-nat" style="background:var(--seg4)"></span><span id="m-b-st" style="background:var(--seg1)"></span></div>
+    <div class="legend">
+      <span id="m-l-nat"><i style="background:var(--seg4)"></i>National team <b id="m-nat-line">$6.24M</b></span>
+      <span><i style="background:var(--seg1)"></i>State deployment <b id="m-st-line">$23.64M</b> <span id="m-st-basis">(6 × $3.94M)</span></span>
+    </div>
+    <div class="note"><b>Not included:</b> these figures are staff and platform only. They exclude activations, live and in-person events, and media budgets. That is the difference between the $29.9M floor shown here and the $60M ask.</div>
+  </section>
+
+  <!-- ============ SLIDER 3 : INVESTMENT ============ -->
+  <section class="panel" id="s2">
+    <span class="tag">Investment · The Budget</span>
+    <h2>What it costs to build The 80 Engine</h2>
+    <p class="shows"><b>What it shows:</b> Build the organization one step at a time. Each state brings a director and a full creative team. The last step adds the national team that runs across all of them. These figures are people only — salaries and benefits.</p>
+
+    <div class="presets" id="bud-presets">
+      <button type="button" data-bud="0">Nothing yet</button>
+      <button type="button" data-bud="1">One state</button>
+      <button type="button" data-bud="3">Three states</button>
+      <button type="button" data-bud="6">Six states</button>
+      <button type="button" data-bud="7" class="active">Full deployment</button>
+    </div>
+
+    <div class="ctrl">
+      <div class="lab"><span>Build the organization</span><span class="val" id="bud-step-val">6 states + national team</span></div>
+      <input type="range" id="bud-step" min="0" max="7" step="1" value="7" aria-label="Build the organization">
+      <div class="marks"><span>Nothing</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6 states</span><span>+ National</span></div>
+      <p class="hint">Start at nothing. Add one state, then another, up to six — each adds $1.25M for a state director and a seven-person contract creative team. The final step adds the national team at $3.165M, which supports all six states.</p>
+      <div class="snap"><button id="bud-reset" type="button">Snap to zero</button><button id="bud-fill" type="button">Snap to full</button></div>
+    </div>
+
+    <div class="total"><span class="tl">Total annual</span><span class="tv" id="bud-tot-v">$10.65M</span></div>
+    <div class="bar" aria-hidden="true">
+      <span id="b-dir" style="background:var(--seg1)"></span><span id="b-con" style="background:var(--seg2)"></span>
+      <span id="b-ben" style="background:var(--seg3)"></span><span id="b-nat" style="background:var(--seg4)"></span>
+    </div>
+    <div class="legend">
+      <span id="l-dir"><i style="background:var(--seg1)"></i><span id="bud-k2-l">State directors — 6 × $250K</span> <b id="bud-k2-v">$1.5M</b></span>
+      <span id="l-con"><i style="background:var(--seg2)"></i><span id="bud-k3-l">Contract creative teams — 6 × $984K</span> <b id="bud-k3-v">$5.9M</b></span>
+      <span id="l-ben"><i style="background:var(--seg3)"></i><span id="bud-k4-l">Healthcare &amp; benefits — 6 directors</span> <b id="bud-k4-v">$84K</b></span>
+      <span id="l-nat"><i style="background:var(--seg4)"></i><span id="bud-k1-l">National team — 16 full-time roles</span> <b id="bud-k1-v">$3.165M</b></span>
+    </div>
+  </section>
+
+  <!-- ============ SLIDERS 4 & 5 : INFLUENCER NETWORK ============ -->
+  <section class="panel" id="s3">
+    <span class="tag">Influencer Network · Cost Model</span>
+    <h2>What a local, state, or national program costs</h2>
+    <p class="shows"><b>What it shows:</b> The cost of running the advocate network at any size. Staffing scales with advocate count (1 relationship owner per 25 advocates); the platform layer is a fixed national investment that every level depends on; ad spend is what makes advocates visible beyond their existing audiences.</p>
+
+    <div class="presets" id="inf-presets">
+      <button type="button" data-a="25" data-ad="60000">Local pilot</button>
+      <button type="button" data-a="150" data-ad="480000">Statewide</button>
+      <button type="button" data-a="1200" data-ad="6000000">National</button>
+    </div>
+
+    <div class="ctrl">
+      <div class="row">
+        <div class="lab"><span>Active advocates</span><span class="val" id="adv-val">60</span></div>
+        <input type="range" id="adv" min="10" max="1500" step="5" value="60" aria-label="Active advocates">
+        <p class="hint">10 = a single-town pilot · 150 = a statewide network · 1,500 = national scale</p>
+      </div>
+      <div class="row">
+        <div class="lab"><span>Annual ad / boosting spend</span><span class="val" id="ad-val">$20K</span></div>
+        <input type="range" id="ad" min="0" max="8000000" step="20000" value="20000" aria-label="Annual ad and boosting spend">
+        <p class="hint">Boosting member posts plus awareness ads. $60K/yr sustains a local program; $480K a state; $6M a national cycle.</p>
+      </div>
+    </div>
+
+    <div class="total"><span class="tl">Total annual</span><span class="tv" id="tot-v">—</span></div>
+    <div class="bar" aria-hidden="true">
+      <span id="i-b-staff" style="background:var(--seg1)"></span><span id="i-b-prog" style="background:var(--seg2)"></span>
+      <span id="i-b-plat" style="background:var(--seg3)"></span><span id="i-b-ad" style="background:var(--seg4)"></span>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--seg1)"></i><span id="staff-l">Staff</span> <b id="staff-v">—</b></span>
+      <span><i style="background:var(--seg2)"></i>Program — $150/advocate/mo <b id="prog-v">—</b></span>
+      <span><i style="background:var(--seg3)"></i>Shared platform (national-borne) <b>$51K</b></span>
+      <span><i style="background:var(--seg4)"></i>Ad / boosting spend <b id="li-ad-v">—</b></span>
+    </div>
+    <div class="note"><b>Not included:</b> candidate travel and event production, legal retainers, and content production staff. The $51K platform layer is national's contribution — local campaigns should never be asked to fund it.</div>
+  </section>
+
+  <!-- ============ SLIDERS 6-10 : NARRATIVE & INFLUENCE ============ -->
+  <section class="panel" id="s4">
+    <span class="tag">Narrative &amp; Influence · Where the Money Goes</span>
+    <h2>Set a gift size and see the split</h2>
+    <p class="shows"><b>What it shows:</b> How a gift divides between the permanent core that keeps the operation alive between cycles and the visible activity in states this year. Percentages always total 100 — moving one slider adjusts the others proportionally. These are illustrative planning scenarios, not a final budget.</p>
+
+    <div class="presets" id="mix-presets">
+      <button type="button" data-mix="60,25,10,5">Build the machine</button>
+      <button type="button" data-mix="40,35,20,5" class="active">Balanced</button>
+      <button type="button" data-mix="25,45,25,5">Maximum state activity</button>
+    </div>
+
+    <div class="ctrl">
+      <div class="row">
+        <div class="lab"><span>Annual commitment</span><span class="val" id="tot-val">$5M</span></div>
+        <input type="range" id="tot" min="250000" max="25000000" step="250000" value="5000000" aria-label="Annual commitment">
+      </div>
+      <div class="row">
+        <div class="lab"><span><b>A. Core</b> <small>— the permanent team and the systems that outlast any one cycle</small></span><span class="val" id="a-val">40%</span></div>
+        <input type="range" id="a" min="0" max="100" step="1" value="40" aria-label="Core">
+      </div>
+      <div class="row">
+        <div class="lab"><span><b>B. State portfolios</b> <small>— the standing work inside priority states</small></span><span class="val" id="b-val">35%</span></div>
+        <input type="range" id="b" min="0" max="100" step="1" value="35" aria-label="State portfolios">
+      </div>
+      <div class="row">
+        <div class="lab"><span><b>C. Campaigns &amp; moments</b> <small>— time-bound pushes, events, paid media, rapid response</small></span><span class="val" id="c-val">20%</span></div>
+        <input type="range" id="c" min="0" max="100" step="1" value="20" aria-label="Campaigns and moments">
+      </div>
+      <div class="row">
+        <div class="lab"><span><b>D. Strategic capability</b> <small>— technology, data, tools, and strategic bets</small></span><span class="val" id="d-val">5%</span></div>
+        <input type="range" id="d" min="0" max="100" step="1" value="5" aria-label="Strategic capability">
+      </div>
+    </div>
+
+    <div class="mixbar" style="margin-top:16px">
+      <div id="bar-a" style="background:var(--seg1)"></div><div id="bar-b" style="background:var(--seg2)"></div>
+      <div id="bar-c" style="background:var(--seg3)"></div><div id="bar-d" style="background:var(--seg4)"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v" id="out-a">$2M</div><div class="l">A · Core</div></div>
+      <div class="stat"><div class="v" id="out-b">$1.8M</div><div class="l">B · State portfolios</div></div>
+      <div class="stat"><div class="v" id="out-c">$1M</div><div class="l">C · Campaigns &amp; moments</div></div>
+      <div class="stat"><div class="v" id="out-d">$250K</div><div class="l">D · Strategic capability</div></div>
+    </div>
+    <div class="read" id="mix-read-body"></div>
+  </section>
+
+  <section class="panel" id="s5">
+    <span class="tag">Narrative &amp; Influence · Fund a State</span>
+    <h2>Configure a state pod</h2>
+    <p class="shows"><b>What it shows:</b> The indicative cost of putting a team into one state, by team size and how long it runs. A pod is sized around the work in front of it rather than created as a fixed mini-agency — when the fight in a state gets bigger, the pod gets bigger. Illustrative planning scenarios, not a final budget.</p>
+
+    <div class="presets" id="pod-presets">
+      <button type="button" data-pod="min">Minimum pod</button>
+      <button type="button" data-pod="mid" class="active">Mid pod</button>
+      <button type="button" data-pod="major">Major pod</button>
+    </div>
+    <div class="ctrl">
+      <div class="lab"><span>How long</span><span class="val" id="mon-val">12 months</span></div>
+      <input type="range" id="mon" min="6" max="24" step="3" value="12" aria-label="How long">
+      <div class="marks"><span>6</span><span>9</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24 months</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v" id="pod-cost">$1.5M</div><div class="l">Indicative cost of this pod</div></div>
+      <div class="stat"><div class="v" id="pod-people" style="color:var(--text)">9</div><div class="l">Roles on the team</div></div>
+      <div class="stat"><div class="v" id="pod-months" style="color:var(--text)">12</div><div class="l">Months of continuous work</div></div>
+    </div>
+    <p class="hint">Minimum pod: $500K a year, 6 roles. Mid pod: $1.5M a year, 9 roles. Major pod: $4M a year, 11 roles.</p>
+  </section>
+
+  <footer>Sources: The 80 Donor Book (Executive Summary, section 02 Model State), The 80 Engine investment brief (The Budget) and The Eighty Member Network Briefing (Cost Model) and The 80 Narrative & Influence pitch (Where the Money Goes, Fund a State). Figures unchanged from those documents.</footer>
+</main>
+
+<script>
+(function () {
+  function bar(id, v, total) { document.getElementById(id).style.width = total ? (v / total * 100) + "%" : "0%"; }
+
+  /* ---------- Executive Summary: Model State ---------- */
+  var natEl = document.getElementById("m-nat"), stEl = document.getElementById("m-st");
+  var NAT = 6235000, PER_STATE = 3940000;
+  function money(v) {
+    if (v === 0) return "$0";
+    if (v >= 1000000) return "$" + (v / 1000000).toFixed(2).replace(/\.?0+$/, "") + "M";
+    return "$" + Math.round(v / 1000) + "K";
+  }
+  function recalcModel() {
+    var nat = parseInt(natEl.value, 10), st = parseInt(stEl.value, 10);
+    var natTotal = nat * NAT, stTotal = st * PER_STATE, total = natTotal + stTotal;
+    document.getElementById("m-nat-v").textContent = nat ? "Hired" : "Not yet";
+    document.getElementById("m-st-v").textContent = st;
+    document.getElementById("m-nat-line").textContent = money(natTotal);
+    document.getElementById("m-st-line").textContent = money(stTotal);
+    document.getElementById("m-st-basis").textContent = "(" + st + " × $3.94M)";
+    document.getElementById("m-total").textContent = money(total);
+    document.getElementById("m-l-nat").classList.toggle("off", !nat);
+    bar("m-b-nat", natTotal, total); bar("m-b-st", stTotal, total);
+  }
+  natEl.addEventListener("input", recalcModel);
+  stEl.addEventListener("input", recalcModel);
+  recalcModel();
+
+  /* ---------- Investment: The Budget ---------- */
+  var B = { national: 3165000, stateDirector: 250000, stateContract: 984000, benefits: 14000 };
+  var stepEl = document.getElementById("bud-step");
+  function fmt(n) {
+    if (n === 0) return "$0";
+    if (n >= 1000000) { var m = n / 1000000;
+      return "$" + (m % 1 === 0 ? m.toFixed(0) : m.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")) + "M"; }
+    return "$" + Math.round(n / 1000) + "K";
+  }
+  function T(id, t) { document.getElementById(id).textContent = t; }
+  function recalcBudget() {
+    var step = Number(stepEl.value), natOn = step === 7, states = step === 0 ? 0 : Math.min(step, 6);
+    var natCost = natOn ? B.national : 0, dir = B.stateDirector * states, con = B.stateContract * states,
+        ben = B.benefits * states, total = natCost + dir + con + ben;
+    T("bud-step-val", step === 0 ? "Nothing" : step === 7 ? "6 states + national team" : states + (states === 1 ? " state" : " states"));
+    T("bud-k2-v", fmt(dir));
+    T("bud-k2-l", states === 0 ? "State directors — none funded" : "State directors — " + states + " × $250K");
+    T("bud-k3-v", fmt(con));
+    T("bud-k3-l", states === 0 ? "Contract creative teams — none funded" : "Contract creative teams — " + states + " × $984K");
+    T("bud-k4-v", fmt(ben));
+    T("bud-k4-l", states === 0 ? "Healthcare & benefits — none funded" : "Healthcare & benefits — " + states + (states === 1 ? " director" : " directors"));
+    T("bud-k1-v", natOn ? "$3.165M" : "$0");
+    T("bud-k1-l", natOn ? "National team — 16 full-time roles" : "National team — added at full deployment");
+    T("bud-tot-v", fmt(total));
+    bar("b-dir", dir, total); bar("b-con", con, total); bar("b-ben", ben, total); bar("b-nat", natCost, total);
+    document.getElementById("l-dir").classList.toggle("off", !states);
+    document.getElementById("l-con").classList.toggle("off", !states);
+    document.getElementById("l-ben").classList.toggle("off", !states);
+    document.getElementById("l-nat").classList.toggle("off", !natOn);
+    document.querySelectorAll("#bud-presets button").forEach(function (b) {
+      b.classList.toggle("active", Number(b.getAttribute("data-bud")) === step);
+    });
+  }
+  stepEl.addEventListener("input", recalcBudget);
+  document.getElementById("bud-reset").addEventListener("click", function () { stepEl.value = 0; recalcBudget(); });
+  document.getElementById("bud-fill").addEventListener("click", function () { stepEl.value = stepEl.max; recalcBudget(); });
+  document.querySelectorAll("#bud-presets button").forEach(function (b) {
+    b.addEventListener("click", function () { stepEl.value = b.getAttribute("data-bud"); recalcBudget(); });
+  });
+  recalcBudget();
+  /* ---------- Influencer Network: Cost Model ---------- */
+  var PLATFORM = 51400, advEl = document.getElementById("adv"), adEl = document.getElementById("ad");
+  function fmtI(n) { return n >= 1000000 ? "$" + (n / 1000000).toFixed(2) + "M" : "$" + Math.round(n / 1000) + "K"; }
+  function recalcInf() {
+    var advocates = Number(advEl.value), adSpend = Number(adEl.value);
+    var owners = Math.max(1, Math.ceil(advocates / 25)), leads = Math.max(1, Math.ceil(owners / 6)),
+        ops = Math.max(1, Math.ceil(owners / 2));
+    var staff = owners * 78000 + leads * 110000 + ops * 62000, program = advocates * 150 * 12,
+        total = staff + program + PLATFORM + adSpend;
+    T("adv-val", advocates); T("ad-val", fmtI(adSpend));
+    T("staff-v", fmtI(staff)); T("staff-l", "Staff — " + owners + " owners, " + leads + " lead, " + ops + " ops");
+    T("prog-v", fmtI(program)); T("li-ad-v", fmtI(adSpend)); T("tot-v", fmtI(total));
+    bar("i-b-staff", staff, total); bar("i-b-prog", program, total); bar("i-b-plat", PLATFORM, total); bar("i-b-ad", adSpend, total);
+    document.querySelectorAll("#inf-presets button").forEach(function (b) {
+      b.classList.toggle("active", Number(b.getAttribute("data-a")) === advocates && Number(b.getAttribute("data-ad")) === adSpend);
+    });
+  }
+  advEl.addEventListener("input", recalcInf); adEl.addEventListener("input", recalcInf);
+  document.querySelectorAll("#inf-presets button").forEach(function (b) {
+    b.addEventListener("click", function () { advEl.value = b.getAttribute("data-a"); adEl.value = b.getAttribute("data-ad"); recalcInf(); });
+  });
+  recalcInf();
+  /* ---------- Narrative & Influence: Funding Mix ---------- */
+  function fmtN(n) { return n >= 1000000 ? "$" + (n / 1000000).toFixed(1).replace(/\.0$/, "") + "M" : "$" + Math.round(n / 1000) + "K"; }
+  var totEl = document.getElementById("tot"), mixIds = ["a","b","c","d"],
+      mixEls = mixIds.map(function (i) { return document.getElementById(i); });
+  function mixValues() { return mixEls.map(function (e) { return Number(e.value); }); }
+  function normalize(mi) {
+    var v = mixValues(), moved = Math.min(100, v[mi]);
+    var oi = [0,1,2,3].filter(function (i) { return i !== mi; });
+    var os = oi.reduce(function (s, i) { return s + v[i]; }, 0), rem = 100 - moved;
+    if (os === 0) { oi.forEach(function (i, k) { v[i] = k === 0 ? rem : 0; }); }
+    else {
+      var raw = oi.map(function (i) { return v[i] / os * rem; });
+      var rd = raw.map(function (x) { return Math.max(0, Math.round(x)); });
+      var drift = rem - rd.reduce(function (s, x) { return s + x; }, 0), big = 0;
+      rd.forEach(function (x, k) { if (x > rd[big]) big = k; });
+      rd[big] = Math.max(0, rd[big] + drift);
+      oi.forEach(function (i, k) { v[i] = rd[k]; });
+    }
+    v[mi] = moved; mixEls.forEach(function (e, i) { e.value = v[i]; }); return v;
+  }
+  var READ = {
+    coreHeavy: "Weighted toward permanent capability. This builds the team, the systems, and the institutional memory that make everything else possible — with less visible activity in states in year one.",
+    balanced: "A working balance. Enough permanent capability to hold continuity and judgment, enough state money to put real work in front of real voters, and a reserve for the moments nobody can schedule.",
+    stateHeavy: "Weighted toward visible activity. More content, more states, more in market this year — with a lighter permanent core to carry strategy, quality, and memory between cycles.",
+    thinCore: "The core is light in this mix. Continuity is what the core pays for — at this level the operation looks busy in year one but has less capacity to hold strategy and institutional memory across cycles."
+  };
+  function recalcMix(mi) {
+    var v = (typeof mi === "number") ? normalize(mi) : mixValues(), total = Number(totEl.value);
+    T("tot-val", fmtN(total));
+    mixIds.forEach(function (id, i) {
+      T(id + "-val", v[i] + "%"); T("out-" + id, fmtN(total * v[i] / 100));
+      var b = document.getElementById("bar-" + id); b.style.width = v[i] + "%"; b.textContent = v[i] >= 8 ? v[i] + "%" : "";
+    });
+    T("mix-read-body", v[0] < 20 ? READ.thinCore : v[0] >= 50 ? READ.coreHeavy : (v[1] + v[2] >= 55) ? READ.stateHeavy : READ.balanced);
+    document.querySelectorAll("#mix-presets button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-mix") === v.join(",")); });
+  }
+  mixEls.forEach(function (e, i) { e.addEventListener("input", function () { recalcMix(i); }); });
+  totEl.addEventListener("input", function () { recalcMix(); });
+  document.querySelectorAll("#mix-presets button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var parts = b.getAttribute("data-mix").split(",").map(Number);
+      mixEls.forEach(function (e, i) { e.value = parts[i]; }); recalcMix();
+    });
+  });
+  recalcMix();
+
+  /* ---------- Narrative & Influence: State Pod ---------- */
+  var POD = { min: { cost: 500000, roles: 6 }, mid: { cost: 1500000, roles: 9 }, major: { cost: 4000000, roles: 11 } };
+  var curPod = "mid", monEl = document.getElementById("mon");
+  function recalcPod() {
+    var months = Number(monEl.value), pod = POD[curPod];
+    T("mon-val", months + " months"); T("pod-cost", fmtN(pod.cost * months / 12));
+    T("pod-people", pod.roles); T("pod-months", months);
+    document.querySelectorAll("#pod-presets button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-pod") === curPod); });
+  }
+  document.querySelectorAll("#pod-presets button").forEach(function (b) {
+    b.addEventListener("click", function () { curPod = b.getAttribute("data-pod"); recalcPod(); });
+  });
+  monEl.addEventListener("input", recalcPod);
+  recalcPod();
+})();
+</script>
+</body>
+</html>
